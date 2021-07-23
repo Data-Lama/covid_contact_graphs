@@ -100,7 +100,7 @@ def main(location_id, remove_from_geo = False):
     if remove_from_geo:
 
         print("Deletes Geometry")
-        stop()
+
         # Deletes graph movement
         sql = f"""
 
@@ -117,29 +117,10 @@ def main(location_id, remove_from_geo = False):
 
 if __name__ == "__main__":
     
-    #location_id = sys.argv[1]
+    location_id = sys.argv[1]
 
     remove_from_geo = False
     if len(sys.argv) >= 3:
         remove_from_geo = sys.argv[2].upper() == "TRUE"
 
-    arr = ['colombia_bogota_poligono_salud_2',
-            'colombia_bogota_poligono_salud_1',
-            'colombia_bogota_poligono_salud_3',
-            'colombia_bogota_poligono_salud_4',
-            'colombia_bogota_poligono_salud_bosa',
-            'colombia_bogota_study_9',
-            'colombia_bogota_super_spreading_6',
-            'colombia_bogota_study_10',
-            'colombia_bogota_study_8',
-            'colombia_bogota_study_7',
-            'colombia_bogota_study_6',
-            'colombia_bogota_super_spreading_1',
-            'colombia_bogota_super_spreading_8',
-            'colombia_bogota_super_spreading_4',
-            'colombia_bogota_super_spreading_2']
-
-    for location_id in arr:
-        print(location_id)
-        main(location_id, remove_from_geo = False)
-        print()
+    main(location_id, remove_from_geo = True)        

@@ -25,7 +25,6 @@ global_min_seniority_search = pd.to_datetime("2020-11-01 00:00:00")
 global_min_attribute_date = pd.to_datetime('2021-01-10 00:00:00')
 
 
-
 # GLobal date fomat
 date_format = '%Y-%m-%d'
 long_date_format = '%Y-%m-%d %H:%M:%S'
@@ -52,7 +51,7 @@ BOGOTA = "bogota"
     
 
 debug = False
-debug_current_date = "2021-01-10"
+debug_current_date = "2021-07-15"
 
 # Construction types
 CT_DYNAMIC = "DYNAMIC"
@@ -67,9 +66,9 @@ def get_today(only_date = False):
     '''
     
     if only_date:
-        d = pd.to_datetime((datetime.now() - timedelta(days = global_day_shift, hours = 6)).strftime('%Y-%m-%d'))
+        d = pd.to_datetime((datetime.now() - timedelta(days = global_day_shift, hours = 0)).strftime('%Y-%m-%d'))
     else:
-        d = pd.to_datetime((datetime.now() - timedelta(days = global_day_shift, hours = 6)).strftime('%Y-%m-%d 00:00:00'))
+        d = pd.to_datetime((datetime.now() - timedelta(days = global_day_shift, hours = 0)).strftime('%Y-%m-%d 00:00:00'))
     
 
     if debug:

@@ -1,4 +1,5 @@
 # Excecutes the update functions for transits and contacts
+from google.cloud import bigquery
 import pathlib
 import os, sys
 from datetime import datetime

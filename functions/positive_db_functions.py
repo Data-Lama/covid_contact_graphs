@@ -13,9 +13,8 @@ days_delay = 3
 
 # Max Symptoms
 bogota_sql_max_date = """
-                    SELECT MAX(DATE(TIMESTAMP(fechainici))) as max_date
-                    FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`
-                    WHERE CHAR_LENGTH(fechainici) = 10
+                    SELECT MAX(DATE(TIMESTAMP(IFNULL(fechainici, fechaconsu)))) as max_date
+                    FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`  
                 """
 
 
@@ -27,9 +26,8 @@ generic_sql_max_date = """
 
 # Min Symptoms
 bogota_sql_min_date = """
-                    SELECT MIN(DATE(TIMESTAMP(fechainici))) as min_date
+                    SELECT MIN(DATE(TIMESTAMP(IFNULL(fechainici, fechaconsu)))) as min_date
                     FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`
-                    WHERE CHAR_LENGTH(fechainici) = 10
                 """
 
 # Min Symptoms

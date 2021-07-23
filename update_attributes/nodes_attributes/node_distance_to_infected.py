@@ -95,7 +95,11 @@ bogota_sql = """
                   WHERE loc.week_date >= DATE_SUB(DATE("{end_date_string}"), INTERVAL 4 WEEK)
                      AND loc.week_date <= DATE_ADD(DATE("{end_date_string}"), INTERVAL 1 WEEK)  -- Casas del ultimo mes (mas una semana)
                    ),
-
+                -- Positive cases
+                positives as (
+                    SELECT IFNULL(fechainici,fechaconsu) as fecha, geometry
+                    FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`
+                ),
                 -- Distance to infected
                 distances as (
                 SELECT identifier, MIN(distance) as distance_to_infected
@@ -105,9 +109,9 @@ bogota_sql = """
                  houses.identifier as identifier,
                  ST_DISTANCE(ST_GEOGPOINT(houses.lon, houses.lat), infectados.geometry) as distance -- Distancia a infectado (en metros)
                  FROM houses as houses -- Tabla con las casas
-                 CROSS JOIN (SELECT * FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`                  
-                    WHERE  TRIM(fechainici) <> "" AND "{end_date_string}" >= DATE_SUB(DATE(TIMESTAMP(fechainici)), INTERVAL 5 DAY) 
-                            AND "{end_date_string}" <= DATE_ADD(DATE(TIMESTAMP(fechainici)), INTERVAL 15 DAY)   
+                 CROSS JOIN (SELECT * FROM positives                  
+                        WHERE  fecha IS NOT NULL AND TRIM(fecha) <> "" AND "{end_date_string}" >= DATE_SUB(DATE(TIMESTAMP(fecha)), INTERVAL 5 DAY) 
+                            AND "{end_date_string}" <= DATE_ADD(DATE(TIMESTAMP(fecha)), INTERVAL 15 DAY)   
                       ) as infectados -- Tabla con los infectados (del ultimo mes)             
                  ) as d -- Matriz de distancia entre las casas y los infectados
                  GROUP BY identifier -- Agrupa por el identificador para encontrar la minima distancia
@@ -117,7 +121,8 @@ bogota_sql = """
                  SELECT graph_ids.identifier as identifier, distances.distance_to_infected as distance_to_infected
                  FROM graph_ids
                  LEFT JOIN distances
-                 ON graph_ids.identifier = distances.identifier                
+                 ON graph_ids.identifier = distances.identifier    
+            
                 
         """
 

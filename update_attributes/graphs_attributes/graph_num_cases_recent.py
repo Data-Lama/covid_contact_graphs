@@ -1,4 +1,4 @@
-# Graph Number of cases attribute
+# Graph Number of cases attribute (recent)
 
 
 from graph_attribute_generic_with_cases import GenericGraphAttributeWithCases
@@ -12,7 +12,7 @@ import positive_db_functions as pos_fun
 property_values = {}
 
 # Attribute name
-property_values['attribute_name'] = 'number_of_cases_accumulated'
+property_values['attribute_name'] = 'number_of_cases_recent'
 
 
 
@@ -24,6 +24,7 @@ generic_sql = """
         SELECT COUNT(*) as total
         FROM  grafos-alcaldia-bogota.positives.{table_name}
         WHERE  date_start_symtoms <= "{end_date_string}"
+            AND DATE(date_start_symtoms) >= DATE_SUB(DATE("{end_date_string}"), INTERVAL 2 WEEK)
             AND ST_DWithin(ST_GeogPoint(lon, lat), 
                 (SELECT geometry FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"), 
                   (SELECT precision FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"))
@@ -37,13 +38,14 @@ bogota_sql = """
         SELECT COUNT(*) as total
         FROM  `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha` 
         WHERE  IFNULL(fechainici,fechaconsu) <= "{end_date_string}"
+                AND DATE(IFNULL(fechainici,fechaconsu)) >= DATE_SUB(DATE("{end_date_string}"), INTERVAL 2 WEEK)
            AND ST_DWithin(geometry, 
                 (SELECT geometry FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"), 
                   (SELECT precision FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"))
 
 """
 
-class GraphNumberOfCasesAccumulated(GenericGraphAttributeWithCases):
+class GraphNumberOfCasesRecent(GenericGraphAttributeWithCases):
     '''
     Script that computes the number of cases by the given week
     '''

@@ -36,6 +36,7 @@ import graphs_attributes.graph_eigenvalue_weighted as graph_eigenvalue_weighted
 import graphs_attributes.graph_eigenvalue_unweighted as graph_eigenvalue_unweighted
 import graphs_attributes.graph_transitivity as graph_transitivity
 import graphs_attributes.graph_num_cases_accumulated as graph_num_cases_accumulated
+import graphs_attributes.graph_num_cases_recent as graph_num_cases_recent
 import graphs_attributes.graph_avg_distance_to_infected as graph_avg_distance_to_infected
 import graphs_attributes.graph_num_contacts_inside as graph_num_contacts_inside
 
@@ -61,11 +62,11 @@ all_graph_attributes.append(graph_pagerank_gini.GraphPageRankGini())
 #all_graph_attributes.append(graph_eigenvector_gini.GraphEigenvectorGini())
 all_graph_attributes.append(graph_personalized_pagerank_gini.GraphPersonalizedPageRankGini())
 #all_graph_attributes.append(graph_powerlaw_degree_test.GraphPowerLawTest())
-#all_graph_attributes.append(graph_eigenvalue_unweighted.GraphEigenValueUnweighted())
-#all_graph_attributes.append(graph_eigenvalue_weighted.GraphEigenValueWeighted())
+all_graph_attributes.append(graph_eigenvalue_unweighted.GraphEigenValueUnweighted())
+all_graph_attributes.append(graph_eigenvalue_weighted.GraphEigenValueWeighted())
 #all_graph_attributes.append(graph_transitivity.GraphTransitivity())
 all_graph_attributes.append(graph_num_cases_accumulated.GraphNumberOfCasesAccumulated())
-
+all_graph_attributes.append(graph_num_cases_recent.GraphNumberOfCasesRecent())
 
 
 # Orders the list by priority
