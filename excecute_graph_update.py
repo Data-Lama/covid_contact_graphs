@@ -24,6 +24,7 @@ import update_sizes
 import update_paths
 import update_movement
 import update_seniority
+import update_distance_to_housing
 
 
 print('')
@@ -100,10 +101,20 @@ update_paths.main()
 
 
 # Bogota tiene ciertos valores computados. Faltan las localidades
+print('--------------------------------------')
 print()
 print('Graph Movement') # location Level
 print('')
 update_movement.main() # CHECK STATIC LOCATIONS
+
+
+print('--------------------------------------')
+print()
+print('Distance to Housing') # Code Level
+print('')
+update_distance_to_housing.main()
+
+
 
 
 

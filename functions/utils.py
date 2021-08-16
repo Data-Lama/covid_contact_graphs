@@ -401,6 +401,30 @@ def get_housing_code_coverage(client):
 
 
 
+def get_distance_to_housing_code_coverage(client):
+    '''
+    Gets the max dates for all codes
+    '''
+    
+    
+    sql = f"""
+            SELECT codes.code_depto as code_depto,
+                   max_date       
+            FROM
+            (SELECT code_depto,
+                   MAX(date) as max_date
+            FROM housing_location.colombian_distance_to_housing 
+            GROUP BY code_depto) as loc
+            RIGHT JOIN
+            (SELECT code_depto
+             FROM geo.locations_geo_codes
+             GROUP BY code_depto) as codes
+             ON codes.code_depto = loc.code_depto
+    
+    """
+    
+    return(run_simple_query(client, sql))
+
 
 
 def update_housing(client, code_depto, start_date, end_date):
@@ -562,6 +586,84 @@ def update_housing(client, code_depto, start_date, end_date):
     query_job.result()
     
     
+    
+    return(query_job)
+
+
+
+def update_distance_to_housing(client, code_depto, start_date, end_date):
+    '''
+    Updates distance to housing for a given code for a given sunday (and the 6 days behind)
+    
+    '''
+
+    table_id = "grafos-alcaldia-bogota.housing_location.colombian_distance_to_housing"
+
+    if pd.to_datetime(start_date).dayofweek != 0:
+        raise ValueError(f'Given Start date is not a monday. Day of week: {pd.to_datetime(start_date).dayofweek}')  
+        
+    if pd.to_datetime(end_date).dayofweek != 6:
+        raise ValueError(f'Given end date is not a sunday. Day of week: {pd.to_datetime(end_date).dayofweek}')    
+    
+    # SQL Distance
+    sql = f"""
+
+        WITH housing AS (
+            SELECT identifier, week_date, lat, lon
+            FROM `grafos-alcaldia-bogota.housing_location.colombia_housing_location`
+            WHERE code_depto = "{code_depto}"
+            AND type = "HOUSE"
+            AND  week_date >= "{start_date}"
+            AND  week_date <= "{end_date}"
+        ), paths AS (
+
+            -- Extracts from path the coordinates (Unions all to incude start and finish coordinates )
+            SELECT  identifier, date, lon, lat, week_date
+            FROM (        
+                SELECT identifier, date, lon_1 as lon, lat_1 as lat, DATE_ADD(DATE_TRUNC(date, WEEK(MONDAY)), INTERVAL 6 DAY) as week_date
+                FROM `grafos-alcaldia-bogota.paths.identifiers_paths`
+                WHERE code_depto = "{code_depto}"
+                AND  date >= "{start_date}"
+                AND  date <= "{end_date}"
+
+                UNION ALL
+
+                SELECT identifier, date, lon_2 as lon, lat_2 as lat, DATE_ADD(DATE_TRUNC(date, WEEK(MONDAY)), INTERVAL 6 DAY) as week_date
+                FROM `grafos-alcaldia-bogota.paths.identifiers_paths`
+                WHERE code_depto = "{code_depto}"
+                AND  date >= "{start_date}"
+                AND  date <= "{end_date}"
+            )
+            GROUP BY identifier, date, lon, lat, week_date
+        )
+
+
+        SELECT "{code_depto}" as code_depto,
+                identifier as identifier,
+                date as date,
+                MIN(distance) as min_distance_to_house,
+                MAX(distance) as max_distance_to_house,
+                AVG(distance) as avg_distance_to_house
+        FROM
+        (
+            SELECT p.identifier, p.date, ST_DISTANCE(ST_GEOGPOINT(p.lon, p.lat), ST_GEOGPOINT(h.lon, h.lat)) as distance 
+            FROM paths AS p
+            JOIN housing AS h
+            ON p.identifier = h.identifier
+                AND p.week_date = h.week_date 
+        )
+        GROUP BY identifier, date
+
+    
+    """
+    
+    job_config = bigquery.QueryJobConfig(destination = table_id, 
+                                         write_disposition = 'WRITE_APPEND')
+    
+    
+    # Excecutes
+    query_job = client.query(sql, job_config=job_config)
+    query_job.result()
     
     return(query_job)
 
