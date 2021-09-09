@@ -55,6 +55,10 @@ class GenericNodeAttribute(GenericWeeklyAttribute):
         if 'attribute_name' not in df_result.columns:
             raise ValueError(f'The column "attribute_name" was not found in the columns {df_result.columns}')            
 
+        num_nodes = self.df_graph_sizes.loc[(location_id,end_date_string),'num_nodes'].values[0]        
+        if df_result.shape[0] != num_nodes:
+            raise ValueError(f'The script is trying to insert {df_result.shape[0]} node attributes of a graph with size: {num_nodes}')
+
         df_result.rename(columns = {'value': 'attribute_value'}, inplace = True)
 
         # Adds the columns
@@ -112,7 +116,11 @@ class GenericNodeAttribute(GenericWeeklyAttribute):
             raise ValueError(f'The column "identifier" was not found in the columns {df_result.columns}')
                     
         if 'attribute_name' not in df_result.columns:
-            raise ValueError(f'The column "attribute_name" was not found in the columns {df_result.columns}')            
+            raise ValueError(f'The column "attribute_name" was not found in the columns {df_result.columns}')
+
+        num_nodes = self.df_graph_sizes.loc[(location_id,end_date_string),'num_nodes']
+        if df_result.shape[0] != num_nodes:
+            raise ValueError(f'The script is trying to insert {df_result.shape[0]} node attributes of a graph with size: {num_nodes}')
 
         df_result.rename(columns = {'value': 'attribute_value'}, inplace = True)
 

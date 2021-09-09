@@ -13,7 +13,10 @@ import positive_db_functions as pos_fun
 property_values = {}
 
 # Attribute name
-property_values['attribute_name'] = 'personalized_pagerank_centrality'
+property_values['attribute_name'] = 'personalized_pagerank_centrality_old'
+
+# Starting dates
+property_values['starting_date'] = pd.to_datetime("2020-03-01")
 
 # Priority
 property_values['priority'] = 2
@@ -30,7 +33,7 @@ eps = 1e-16
 # Constant for division (For weight depending on distance)
 div = 1200 # in meters
 
-class NodePersonalizedPageRank(GenericNodeAttributeWithCases):
+class NodePersonalizedPageRankOld(GenericNodeAttributeWithCases):
     '''
     Script that computes the pagerank of the nodes
     '''
@@ -71,6 +74,48 @@ class NodePersonalizedPageRank(GenericNodeAttributeWithCases):
         raise ValueError('Should not enter here')
     
 
+    def location_id_supported(self, location_id):
+        '''
+        OVERWRITTEN
+        # ---------------
+        
+        Only Bogota and localities are supported
+        
+        params
+            - location_id (str)
+            - current_date (pd.datetime): the current datetime
+
+        returns
+            Boolean
+        '''
+
+        is_bogota = location_id == "colombia_bogota"
+        is_locality = "_localidad_" in location_id
+
+        return( is_bogota or is_locality)
+    
+
+        
+    def location_id_supported_on_date(self, location_id, current_date):
+        '''
+        OVERWRITTEN
+        # --------------
+        
+        Only computes over specific dates
+        
+        params
+            - location_id (str)
+            - current_date (pd.datetime): the current datetime
+
+        returns
+            Boolean
+        '''
+        
+        min_date = pd.to_datetime("2020-03-01")
+        max_date = pd.to_datetime("2021-05-28")
+        
+        return(current_date >= min_date and current_date <= max_date)
+
     
     def compute_attribute_for_interval(self, location_id, start_date_string, end_date_string):
         '''
@@ -91,7 +136,7 @@ class NodePersonalizedPageRank(GenericNodeAttributeWithCases):
                 FROM {utils.nodes_attribute_table}
                 WHERE location_id = '{location_id}'
                     AND date = '{end_date_string}'
-                    AND attribute_name = "distance_to_infected"
+                    AND attribute_name = "distance_to_infected_old"
         """
         
         # Compute Weights

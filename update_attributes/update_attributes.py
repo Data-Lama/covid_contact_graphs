@@ -17,24 +17,26 @@ import utils
 
 # Nodes
 import nodes_attributes.node_distance_to_infected as node_distance_to_infected
-import nodes_attributes.node_degree as node_degree
+#import nodes_attributes.node_degree as node_degree
 import nodes_attributes.node_pagerank as node_pagerank
-import nodes_attributes.node_betweenness as node_betweenness
-import nodes_attributes.node_eigenvector as node_eigenvector
+#import nodes_attributes.node_betweenness as node_betweenness
+#import nodes_attributes.node_eigenvector as node_eigenvector
 import nodes_attributes.node_personalized_pagerank as node_personalized_pagerank
+import nodes_attributes.node_personalized_pagerank_old as node_personalized_pagerank_old
 
 # Graphs
 import graphs_attributes.graph_size as graph_size
 import graphs_attributes.graph_num_edges as graph_num_edges
 import graphs_attributes.graph_num_contacts as graph_num_contacts
 import graphs_attributes.graph_pagerank_gini as graph_pagerank_gini
-import graphs_attributes.graph_betweenness_gini as graph_betweenness_gini
-import graphs_attributes.graph_eigenvector_gini as graph_eigenvector_gini
+#import graphs_attributes.graph_betweenness_gini as graph_betweenness_gini
+#import graphs_attributes.graph_eigenvector_gini as graph_eigenvector_gini
 import graphs_attributes.graph_personalized_pagerank_gini as graph_personalized_pagerank_gini
-import graphs_attributes.graph_powerlaw_degree_test as graph_powerlaw_degree_test
+import graphs_attributes.graph_personalized_pagerank_gini_old as graph_personalized_pagerank_gini_old
+#import graphs_attributes.graph_powerlaw_degree_test as graph_powerlaw_degree_test
 import graphs_attributes.graph_eigenvalue_weighted as graph_eigenvalue_weighted
 import graphs_attributes.graph_eigenvalue_unweighted as graph_eigenvalue_unweighted
-import graphs_attributes.graph_transitivity as graph_transitivity
+#import graphs_attributes.graph_transitivity as graph_transitivity
 import graphs_attributes.graph_num_cases_accumulated as graph_num_cases_accumulated
 import graphs_attributes.graph_num_cases_recent as graph_num_cases_recent
 import graphs_attributes.graph_avg_distance_to_infected as graph_avg_distance_to_infected
@@ -49,6 +51,7 @@ all_node_attributes.append(node_pagerank.NodePageRank())
 #all_node_attributes.append(node_eigenvector.NodeEigenvector())
 all_node_attributes.append(node_distance_to_infected.NodeDistanceToInfected())
 all_node_attributes.append(node_personalized_pagerank.NodePersonalizedPageRank())
+#all_node_attributes.append(node_personalized_pagerank_old.NodePersonalizedPageRankOld())
 
 # Include here the desired graph attributes
 # ------------------------------------
@@ -61,6 +64,7 @@ all_graph_attributes.append(graph_num_contacts_inside.GraphNumberOfContactsInsid
 all_graph_attributes.append(graph_pagerank_gini.GraphPageRankGini())
 #all_graph_attributes.append(graph_eigenvector_gini.GraphEigenvectorGini())
 all_graph_attributes.append(graph_personalized_pagerank_gini.GraphPersonalizedPageRankGini())
+#all_graph_attributes.append(graph_personalized_pagerank_gini_old.GraphPersonalizedPageRankGiniOld())
 #all_graph_attributes.append(graph_powerlaw_degree_test.GraphPowerLawTest())
 all_graph_attributes.append(graph_eigenvalue_unweighted.GraphEigenValueUnweighted())
 all_graph_attributes.append(graph_eigenvalue_weighted.GraphEigenValueWeighted())

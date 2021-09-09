@@ -613,8 +613,7 @@ def update_distance_to_housing(client, code_depto, start_date, end_date):
             FROM `grafos-alcaldia-bogota.housing_location.colombia_housing_location`
             WHERE code_depto = "{code_depto}"
             AND type = "HOUSE"
-            AND  week_date >= "{start_date}"
-            AND  week_date <= "{end_date}"
+            AND  week_date = "{end_date}"
         ), paths AS (
 
             -- Extracts from path the coordinates (Unions all to incude start and finish coordinates )
