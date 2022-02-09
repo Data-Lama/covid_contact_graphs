@@ -37,8 +37,9 @@ bogota_sql = """
 
         SELECT COUNT(*) as total
         FROM  `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha` 
-        WHERE  IFNULL(fechainici,fechaconsu) <= "{end_date_string}"
-                AND DATE(IFNULL(fechainici,fechaconsu)) >= DATE_SUB(DATE("{end_date_string}"), INTERVAL 2 WEEK)
+        WHERE SAFE_CAST(IFNULL({first_bogota_date_col},{second_bogota_date_col}) AS TIMESTAMP) IS NOT NULL
+                AND DATE(IFNULL({first_bogota_date_col},{second_bogota_date_col})) <= "{end_date_string}"
+                AND DATE(IFNULL({first_bogota_date_col},{second_bogota_date_col})) >= DATE_SUB(DATE("{end_date_string}"), INTERVAL 2 WEEK)
            AND ST_DWithin(geometry, 
                 (SELECT geometry FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"), 
                   (SELECT precision FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"))
@@ -100,7 +101,10 @@ class GraphNumberOfCasesRecent(GenericGraphAttributeWithCases):
         city = utils.get_city(self.client, location_id, self.df_codes)
                 
         if city == utils.BOGOTA:
-            query = bogota_sql.format(end_date_string = end_date_string, location_id = location_id)
+            query = bogota_sql.format(end_date_string = end_date_string, 
+                                        location_id = location_id,
+                                        first_bogota_date_col = pos_fun.first_bogota_date_col,
+                                        second_bogota_date_col = pos_fun.second_bogota_date_col)
             
         else:
             query = generic_sql.format(table_name = city, end_date_string = end_date_string, location_id = location_id)

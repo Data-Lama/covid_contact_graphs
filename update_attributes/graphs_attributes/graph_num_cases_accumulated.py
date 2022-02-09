@@ -15,7 +15,6 @@ property_values = {}
 property_values['attribute_name'] = 'number_of_cases_accumulated'
 
 
-
 # Queries
 # ---------
 # Generic Query
@@ -36,12 +35,14 @@ bogota_sql = """
 
         SELECT COUNT(*) as total
         FROM  `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha` 
-        WHERE  IFNULL(fechainici,fechaconsu) <= "{end_date_string}"
+        WHERE SAFE_CAST(IFNULL({first_bogota_date_col},{second_bogota_date_col}) AS TIMESTAMP) IS NOT NULL  
+            AND DATE(IFNULL({first_bogota_date_col},{second_bogota_date_col})) <= "{end_date_string}"
            AND ST_DWithin(geometry, 
                 (SELECT geometry FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"), 
                   (SELECT precision FROM grafos-alcaldia-bogota.geo.locations_geometries WHERE location_id = "{location_id}"))
 
 """
+
 
 class GraphNumberOfCasesAccumulated(GenericGraphAttributeWithCases):
     '''
@@ -50,13 +51,12 @@ class GraphNumberOfCasesAccumulated(GenericGraphAttributeWithCases):
 
     def __init__(self):
         # Initilizes the super class
-        GenericGraphAttributeWithCases.__init__(self, property_values)  
-                
+        GenericGraphAttributeWithCases.__init__(self, property_values)
 
     def compute_attribute(self, nodes, edges):
         '''
         Main Method to Implement
-        
+
         This method must be implemented by the subclass. It receives compact nodes and edges and 
         must output the corresponding attribute. This method must return unique identifiers and it's good 
         practice to include all identifiers. In case its a graph attribute the dataframe must contain only one row and the
@@ -71,16 +71,15 @@ class GraphNumberOfCasesAccumulated(GenericGraphAttributeWithCases):
                 - id2 (str)
                 - weight (num) Weight od the edge (see get_compact_edgelist)      
 
-        
+
         returns
             pd.DataFrame with the following structure
                 - attribute_name (str): The attribute name                
                 - value (float): The value of the attribute
         '''
-    
+
         raise ValueError('Should not enter here')
-    
-    
+
     def compute_attribute_for_interval(self, location_id, start_date_string, end_date_string):
         '''
         Method that computes the attribute of the class for the given dates. Edit this method if the attributes requieres more than just the nodes and
@@ -94,27 +93,28 @@ class GraphNumberOfCasesAccumulated(GenericGraphAttributeWithCases):
         returns
             pd.DataFrame with the structure of the output of the method compute_attribute   
         '''
-           
+
         city = utils.get_city(self.client, location_id, self.df_codes)
-                
+
         if city == utils.BOGOTA:
-            query = bogota_sql.format(end_date_string = end_date_string, location_id = location_id)
-            
+            query = bogota_sql.format(
+                end_date_string=end_date_string,
+                location_id=location_id,
+                first_bogota_date_col=pos_fun.first_bogota_date_col,
+                second_bogota_date_col=pos_fun.second_bogota_date_col)
+
         else:
-            query = generic_sql.format(table_name = city, end_date_string = end_date_string, location_id = location_id)
-            
+            query = generic_sql.format(
+                table_name=city, end_date_string=end_date_string, location_id=location_id)
+
         # Computes the total
         response = utils.run_simple_query(self.client, query)
-        
+
         # Sets the value
-        response.rename(columns = {'total':'value'}, inplace = True)
-                
+        response.rename(columns={'total': 'value'}, inplace=True)
+
         # Adds the attribute name
         response['attribute_name'] = self.attribute_name
-        
 
         # Returns the value
         return(response)
-    
-    
-            

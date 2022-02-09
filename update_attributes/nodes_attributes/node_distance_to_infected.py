@@ -97,8 +97,9 @@ bogota_sql = """
                    ),
                 -- Positive cases
                 positives as (
-                    SELECT IFNULL(fechainici,fechaconsu) as fecha, geometry
+                    SELECT IFNULL({first_bogota_date_col},{second_bogota_date_col}) as fecha, geometry
                     FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`
+                    WHERE SAFE_CAST(IFNULL({first_bogota_date_col}, {second_bogota_date_col}) AS TIMESTAMP) IS NOT NULL
                 ),
                 -- Distance to infected
                 distances as (
@@ -193,10 +194,17 @@ class NodeDistanceToInfected(GenericNodeAttributeWithCases):
         city = utils.get_city(self.client, location_id, self.df_codes)
         
         if city == utils.BOGOTA:
-            query = bogota_sql.format(location_id = location_id, start_date_string = start_date_string, end_date_string = end_date_string)
+            query = bogota_sql.format(location_id = location_id, 
+                                      start_date_string = start_date_string, 
+                                      end_date_string = end_date_string,
+                                       first_bogota_date_col = pos_fun.first_bogota_date_col,
+                                       second_bogota_date_col = pos_fun.second_bogota_date_col)
             
         else:
-            query = generic_sql.format(table_name = city, location_id = location_id, start_date_string = start_date_string, end_date_string = end_date_string)
+            query = generic_sql.format(table_name = city, 
+                                       location_id = location_id, 
+                                       start_date_string = start_date_string, 
+                                       end_date_string = end_date_string)
             
         # Compute Weights
         nodes = utils.run_simple_query(self.client, query, allow_large_results = True)
