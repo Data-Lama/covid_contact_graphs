@@ -1,5 +1,6 @@
 # enviorment
 env/
+nohup.out
 
 # Logs and progress
 progress/
